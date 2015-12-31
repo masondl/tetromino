@@ -1,2 +1,4 @@
 # tetromino
-Clone of classic Tetris game. Nothing interesting about the implementation, I just did it for fun and to get familiar with SFML
+Clone of classic Tetris game. Nothing interesting about the implementation, I just did it for fun and to get familiar with SFML.
+
+It isn't done. :)
