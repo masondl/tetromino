@@ -78,6 +78,16 @@ void TetrominoUI::run()
                 {
                     model.moveActive(TETROMINO_MOVE_DOWN);
                 }
+                
+                if (event.key.code == sf::Keyboard::Up)
+                {
+                    model.moveActive(TETROMINO_MOVE_DROP);
+                }
+                
+                if (event.key.code == sf::Keyboard::Space)
+                {
+                    model.moveActive(TETROMINO_MOVE_ROTATE);
+                }
             }
             
             if (event.type == sf::Event::Closed)

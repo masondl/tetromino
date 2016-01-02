@@ -9,8 +9,9 @@ enum TetrominoMove_e
 {
     TETROMINO_MOVE_LEFT,
     TETROMINO_MOVE_RIGHT,
-    TETROMINO_MOVE_DOWN
-//    TETROMINO_MOVE_DROP
+    TETROMINO_MOVE_DOWN,
+    TETROMINO_MOVE_ROTATE,
+    TETROMINO_MOVE_DROP
 };
 
 const int GRID_WIDTH  = 10;
@@ -43,6 +44,9 @@ class TetrominoModel
     // Returns the highest row which is occupied by any placed piece. Undefined if none are occupied.
     int  getHighestOccupiedRow();
     bool isRowOccupied(const GridRow_t& row);
+
+    void moveInBounds(Tetromino& tetromino);
+    bool isValid(Tetromino& tetromino);
 
     public:
     TetrominoModel();

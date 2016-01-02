@@ -4,32 +4,32 @@
 
 #include "TetrominoModel.hpp"
 
-void TetrominoModel::moveToBottom(Tetromino& Tetromino)
+void TetrominoModel::moveToBottom(Tetromino& tetromino)
 {
-    while (!isAtBottom(Tetromino))
+    while (!isAtBottom(tetromino))
     {
-        Tetromino.moveDown();
+        tetromino.moveDown();
     }
 }
 
-void TetrominoModel::moveToPlaced(const Tetromino& Tetromino)
+void TetrominoModel::moveToPlaced(const Tetromino& tetromino)
 {
-    TetrominoType_e type = Tetromino.getType();
-    placed[Tetromino.getRow(0)][Tetromino.getCol(0)] = type;
-    placed[Tetromino.getRow(1)][Tetromino.getCol(1)] = type;
-    placed[Tetromino.getRow(2)][Tetromino.getCol(2)] = type;
-    placed[Tetromino.getRow(3)][Tetromino.getCol(3)] = type;
+    TetrominoType_e type = tetromino.getType();
+    placed[tetromino.getRow(0)][tetromino.getCol(0)] = type;
+    placed[tetromino.getRow(1)][tetromino.getCol(1)] = type;
+    placed[tetromino.getRow(2)][tetromino.getCol(2)] = type;
+    placed[tetromino.getRow(3)][tetromino.getCol(3)] = type;
 }
 
-bool TetrominoModel::isAtBottom(const Tetromino& Tetromino)
+bool TetrominoModel::isAtBottom(const Tetromino& tetromino)
 {
     // At bottom if we are literally at bottom of grid...
     // or if we have hit another placed piece
-    return ((Tetromino.getFurthestDown() == GRID_HEIGHT-1) ||
-           (placed[Tetromino.getRow(0)+1][Tetromino.getCol(0)] != TETROMINO_TYPE_EMPTY) ||
-           (placed[Tetromino.getRow(1)+1][Tetromino.getCol(1)] != TETROMINO_TYPE_EMPTY) ||
-           (placed[Tetromino.getRow(2)+1][Tetromino.getCol(2)] != TETROMINO_TYPE_EMPTY) ||
-           (placed[Tetromino.getRow(3)+1][Tetromino.getCol(3)] != TETROMINO_TYPE_EMPTY));
+    return ((tetromino.getFurthestDown() == GRID_HEIGHT-1) ||
+           (placed[tetromino.getRow(0)+1][tetromino.getCol(0)] != TETROMINO_TYPE_EMPTY) ||
+           (placed[tetromino.getRow(1)+1][tetromino.getCol(1)] != TETROMINO_TYPE_EMPTY) ||
+           (placed[tetromino.getRow(2)+1][tetromino.getCol(2)] != TETROMINO_TYPE_EMPTY) ||
+           (placed[tetromino.getRow(3)+1][tetromino.getCol(3)] != TETROMINO_TYPE_EMPTY));
 }
 
 void TetrominoModel::clearFullLines()
@@ -39,6 +39,7 @@ void TetrominoModel::clearFullLines()
         if (isRowFull(placed[row]))
         {
             shiftDown(row);
+            ++row; // We need to check the same row again in the loop
         }
     }
 }
@@ -78,7 +79,7 @@ void TetrominoModel::shiftDown(const int baseIndex)
     }
 }
 
-int  TetrominoModel::getHighestOccupiedRow()
+int TetrominoModel::getHighestOccupiedRow()
 {
     for (int row = 0; row < GRID_HEIGHT; ++row)
     {
@@ -89,6 +90,32 @@ int  TetrominoModel::getHighestOccupiedRow()
     }
     
     return -1;
+}
+
+void TetrominoModel::moveInBounds(Tetromino& tetromino)
+{
+    while (tetromino.getFurthestLeft() < 0)
+    {
+        tetromino.moveRight();
+    }
+    
+    while (tetromino.getFurthestRight() >= GRID_WIDTH)
+    {
+        tetromino.moveLeft();
+    }
+    
+    while (tetromino.getFurthestDown() >= GRID_HEIGHT)
+    {
+        tetromino.moveUp();
+    }
+}
+
+bool TetrominoModel::isValid(Tetromino& tetromino)
+{
+    return (placed[tetromino.getRow(0)][tetromino.getCol(0)] == TETROMINO_TYPE_EMPTY) &&
+           (placed[tetromino.getRow(1)][tetromino.getCol(1)] == TETROMINO_TYPE_EMPTY) &&
+           (placed[tetromino.getRow(2)][tetromino.getCol(2)] == TETROMINO_TYPE_EMPTY) &&
+           (placed[tetromino.getRow(3)][tetromino.getCol(3)] == TETROMINO_TYPE_EMPTY);
 }
 
 TetrominoModel::TetrominoModel() 
@@ -179,32 +206,48 @@ void TetrominoModel::moveActive(TetrominoMove_e move)
 {
     if (hasActive)
     {
+        Tetromino moved = active;
         switch (move)
         {
             case TETROMINO_MOVE_LEFT:
-                if (active.getFurthestLeft() > 0)
+                if (moved.getFurthestLeft() > 0)
                 {
-                    active.moveLeft();
+                    moved.moveLeft();
                 }
                 break;
                 
             case TETROMINO_MOVE_RIGHT:
-                if (active.getFurthestRight() < GRID_WIDTH-1)
+                if (moved.getFurthestRight() < GRID_WIDTH-1)
                 {
-                    active.moveRight();
+                    moved.moveRight();
                 }
                 break;
                 
             case TETROMINO_MOVE_DOWN:
-                if (!isAtBottom(active))
+                if (!isAtBottom(moved))
                 {
-                    active.moveDown();
+                    moved.moveDown();
                 }
+                break;
+            
+            case TETROMINO_MOVE_ROTATE:
+                moved.rotate();
+                // Make sure the rotation hasn't moved it out of bounds
+                moveInBounds(moved);
+                break;
+                
+            case TETROMINO_MOVE_DROP:
+                moveToBottom(moved);
                 break;
                 
             default:
                 printf("Unkown move! %d\n", 
                        static_cast<int>(move));
+        }
+        
+        if (isValid(moved))
+        {
+            active = moved;
         }
     }
 }

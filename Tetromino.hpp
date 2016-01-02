@@ -45,6 +45,14 @@ enum TetrominoType_e
     TETROMINO_TYPE_J
 };
 
+enum RotationPosition_e
+{
+    ROTATION_UP,
+    ROTATION_RIGHT,
+    ROTATION_DOWN,
+    ROTATION_LEFT
+};
+
 const TetrominoType_e TETROMINO_TYPES[] = { TETROMINO_TYPE_O,
                                             TETROMINO_TYPE_T,
                                             TETROMINO_TYPE_I,
@@ -59,9 +67,19 @@ class Tetromino
 {
     private:
     TetrominoType_e type;
+    RotationPosition_e rotation;
     // Coordinates of each block
     int rows[4];
     int cols[4];
+    
+    // Bad (but easy) implementation of rotating ...
+    // TODO... have a subclass for each type and overload the rotate method
+    void rotateT();
+    void rotateI();
+    void rotateS();
+    void rotateZ();
+    void rotateL();
+    void rotateJ();
     
     public:
     Tetromino(TetrominoType_e newType);
@@ -71,6 +89,8 @@ class Tetromino
     void moveDown();
     void moveRight();
     void moveLeft();
+    void moveUp();
+    void rotate();
     
     // Get the furthest occupied row/col in a particular direction.
     int getFurthestRight() const;
