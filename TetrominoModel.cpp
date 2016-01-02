@@ -34,13 +34,27 @@ bool TetrominoModel::isAtBottom(const Tetromino& tetromino)
 
 void TetrominoModel::clearFullLines()
 {
+    int combo = 0;
     for (int row = GRID_HEIGHT-1; row >= 0; --row)
     {
         if (isRowFull(placed[row]))
         {
             shiftDown(row);
             ++row; // We need to check the same row again in the loop
+            ++clearedLines;
+            ++ combo;
+            if (clearedLines <= 100 && 
+                (clearedLines % 10 == 0))
+            {
+                ++level;
+            }
         }
+    }
+    
+    while (combo > 0)
+    {
+        score += (combo * 100);
+        --combo;
     }
 }
 
@@ -120,10 +134,16 @@ bool TetrominoModel::isValid(Tetromino& tetromino)
 
 TetrominoModel::TetrominoModel() 
     : active(TETROMINO_TYPE_EMPTY),
+      next(TETROMINO_TYPE_EMPTY),
+      hold(TETROMINO_TYPE_EMPTY),
       activeDropped(TETROMINO_TYPE_EMPTY)
 {
+    clearedLines = 0;
+    score = 0;
+    level = 0;
     hasActive = false;
-    isRuning  = false;
+    isRunning  = false;
+    hasHeld = false;
     
     for (int row = 0; row < GRID_HEIGHT; ++row)
     {
@@ -144,6 +164,11 @@ const Tetromino& TetrominoModel::getActive() const
     return active;
 }
 
+const Tetromino& TetrominoModel::getNext() const
+{
+    return next;
+}
+
 const Grid_t& TetrominoModel::getPlaced() const
 {
     return placed;
@@ -154,48 +179,101 @@ const Tetromino& TetrominoModel::getActiveDropped() const
     return activeDropped;
 }
 
+const Tetromino& TetrominoModel::getHold() const
+{
+    return hold;
+}
+
+const int TetrominoModel::getClearedLines() const
+{
+    return clearedLines;
+}
+
+const long TetrominoModel::getScore() const
+{
+    return score;
+}
+
+const bool TetrominoModel::getIsRunning() const
+{
+    return isRunning;
+}
+
+const int TetrominoModel::getLevel() const
+{
+    return level;
+}
+
 void TetrominoModel::start()
 {
     clock.restart();
-    isRuning = true;
     srand( time(NULL) );
+    
+    int index = rand() % TETROMINO_TYPES_SIZE;
+    next = Tetromino(TETROMINO_TYPES[index]);
+    hold = Tetromino(TETROMINO_TYPE_EMPTY);
+    
+    for (int row = 0; row < GRID_HEIGHT; ++row)
+    {
+        for (int col = 0; col < GRID_WIDTH; ++col)
+        {
+            placed[row][col] = TETROMINO_TYPE_EMPTY;
+        }
+    }
+    
+    clearedLines = 0;
+    score = 0;
+    level = 1;
+    isRunning = true;
+    hasHeld = false;
+}
+
+void TetrominoModel::checkGameOver()
+{
+    if (isRowOccupied(placed[3]))
+    {
+        isRunning = false;
+        hasActive = false;
+        next = Tetromino(TETROMINO_TYPE_EMPTY);
+        hold = Tetromino(TETROMINO_TYPE_EMPTY);
+    }
 }
 
 void TetrominoModel::update()
 {
+    checkGameOver();
     sf::Time elapsed = clock.getElapsedTime();
     // Advance game every 1 second.
     // TODO: drop this time interval as game level increases
-    if (isRuning && (elapsed.asMilliseconds() > 1000))
+    if (isRunning)
     {
         if (!hasActive)
         {
             // If there is no active tetromino, start dropping a new one.
             // Select a random type
             int index = rand() % TETROMINO_TYPES_SIZE;
-            active = Tetromino(TETROMINO_TYPES[index]);
+            active = next; 
+            next = Tetromino(TETROMINO_TYPES[index]);
             hasActive = true;
+            hasHeld = false;
         }
-        else
+        else if (isAtBottom(active))
         {
-            if (isAtBottom(active))
-            {
-                moveToPlaced(active);
-                hasActive = false;
-                clearFullLines();
-            }
-            else
-            {
-                active.moveDown();
-            }
+            moveToPlaced(active);
+            hasActive = false;
+            clearFullLines();
+        }
+        else if (elapsed.asMilliseconds() > SPEEDS[level-1])
+        {
+            active.moveDown();
+            
+            clock.restart();
         }
         
         activeDropped = active;
         moveToBottom(activeDropped); 
-        
-        clock.restart();
     }
-    else if (isRuning && hasActive)
+    else if (isRunning && hasActive)
     {
         activeDropped = active;
         moveToBottom(activeDropped);   
@@ -227,6 +305,7 @@ void TetrominoModel::moveActive(TetrominoMove_e move)
                 if (!isAtBottom(moved))
                 {
                     moved.moveDown();
+                    score += 1;
                 }
                 break;
             
@@ -237,7 +316,26 @@ void TetrominoModel::moveActive(TetrominoMove_e move)
                 break;
                 
             case TETROMINO_MOVE_DROP:
+                score += (GRID_HEIGHT - moved.getFurthestDown());
                 moveToBottom(moved);
+                break;
+                
+            case TETROMINO_MOVE_HOLD:
+                if (!hasHeld)
+                {
+                    if (hold.getType() == TETROMINO_TYPE_EMPTY)
+                    {
+                        hold = Tetromino(moved.getType());
+                        hasActive = false;
+                    }
+                    else
+                    {
+                        TetrominoType_e holdType = hold.getType();
+                        hold   = Tetromino(moved.getType());
+                        moved  = Tetromino(holdType);
+                    }
+                    hasHeld = true;
+                }
                 break;
                 
             default:

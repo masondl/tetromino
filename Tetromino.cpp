@@ -9,52 +9,52 @@ Tetromino::Tetromino(TetrominoType_e newType)
     switch (type)
     {
         case TETROMINO_TYPE_O:
-            rows[0] = 0; cols[0] = 0;
-            rows[1] = 0; cols[1] = 1;
-            rows[2] = 1; cols[2] = 0;
-            rows[3] = 1; cols[3] = 1;
+            rows[0] = 0; cols[0] = 4;
+            rows[1] = 0; cols[1] = 5;
+            rows[2] = 1; cols[2] = 4;
+            rows[3] = 1; cols[3] = 5;
             break;
             
         case TETROMINO_TYPE_T:
-            rows[0] = 0; cols[0] = 0;
-            rows[1] = 1; cols[1] = 0;
-            rows[2] = 2; cols[2] = 0;
-            rows[3] = 1; cols[3] = 1;
+            rows[0] = 0; cols[0] = 4;
+            rows[1] = 1; cols[1] = 4;
+            rows[2] = 2; cols[2] = 4;
+            rows[3] = 1; cols[3] = 5;
             break;
             
         case TETROMINO_TYPE_I:
-            rows[0] = 0; cols[0] = 0;
-            rows[1] = 1; cols[1] = 0;
-            rows[2] = 2; cols[2] = 0;
-            rows[3] = 3; cols[3] = 0;
+            rows[0] = 0; cols[0] = 4;
+            rows[1] = 1; cols[1] = 4;
+            rows[2] = 2; cols[2] = 4;
+            rows[3] = 3; cols[3] = 4;
             break;
             
         case TETROMINO_TYPE_S:
-            rows[0] = 0; cols[0] = 0;
-            rows[1] = 1; cols[1] = 0;
-            rows[2] = 1; cols[2] = 1;
-            rows[3] = 2; cols[3] = 1;
+            rows[0] = 0; cols[0] = 4;
+            rows[1] = 1; cols[1] = 4;
+            rows[2] = 1; cols[2] = 5;
+            rows[3] = 2; cols[3] = 5;
             break;
             
         case TETROMINO_TYPE_Z:
-            rows[0] = 0; cols[0] = 1;
-            rows[1] = 1; cols[1] = 0;
-            rows[2] = 1; cols[2] = 1;
-            rows[3] = 2; cols[3] = 0;
+            rows[0] = 0; cols[0] = 5;
+            rows[1] = 1; cols[1] = 4;
+            rows[2] = 1; cols[2] = 5;
+            rows[3] = 2; cols[3] = 4;
             break;
             
         case TETROMINO_TYPE_L:
-            rows[0] = 0; cols[0] = 0;
-            rows[1] = 1; cols[1] = 0;
-            rows[2] = 2; cols[2] = 0;
-            rows[3] = 2; cols[3] = 1;
+            rows[0] = 0; cols[0] = 4;
+            rows[1] = 1; cols[1] = 4;
+            rows[2] = 2; cols[2] = 4;
+            rows[3] = 2; cols[3] = 5;
             break;
             
         case TETROMINO_TYPE_J:
-            rows[0] = 0; cols[0] = 1;
-            rows[1] = 1; cols[1] = 1;
-            rows[2] = 2; cols[2] = 1;
-            rows[3] = 2; cols[3] = 0;
+            rows[0] = 0; cols[0] = 5;
+            rows[1] = 1; cols[1] = 5;
+            rows[2] = 2; cols[2] = 5;
+            rows[3] = 2; cols[3] = 4;
             break;
         
         case TETROMINO_TYPE_EMPTY:
