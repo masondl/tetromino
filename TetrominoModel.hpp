@@ -33,7 +33,7 @@ class TetrominoModel
     Tetromino hold;
     bool hasHeld;
     Grid_t placed;
-    sf::Clock clock;
+    sf::Clock clock;  // For controlling falling of pieces
     int clearedLines;
     int level;
     long score;

@@ -257,15 +257,18 @@ void TetrominoModel::update()
             hasActive = true;
             hasHeld = false;
         }
-        else if (isAtBottom(active))
-        {
-            moveToPlaced(active);
-            hasActive = false;
-            clearFullLines();
-        }
         else if (elapsed.asMilliseconds() > SPEEDS[level-1])
         {
-            active.moveDown();
+            if (isAtBottom(active))
+            {
+                moveToPlaced(active);
+                hasActive = false;
+                clearFullLines();
+            }
+            else
+            {
+                active.moveDown();
+            }
             
             clock.restart();
         }
@@ -318,6 +321,9 @@ void TetrominoModel::moveActive(TetrominoMove_e move)
             case TETROMINO_MOVE_DROP:
                 score += (GRID_HEIGHT - moved.getFurthestDown());
                 moveToBottom(moved);
+                moveToPlaced(moved);
+                hasActive = false;
+                clearFullLines();
                 break;
                 
             case TETROMINO_MOVE_HOLD:
